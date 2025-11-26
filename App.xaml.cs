@@ -31,7 +31,7 @@ public partial class App : Application
         }
         else
         {
-            this.Shutdown();
+            Shutdown();
         }
     }
 }

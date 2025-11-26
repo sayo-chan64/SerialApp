@@ -2,13 +2,16 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.IO.Ports;
-using System.Windows; // 明示的に使用しますが、MessageBoxButton等で衝突するため注意
 
 namespace SerialApp.ViewModels;
 
 public partial class ConnectViewModel : ObservableObject
 {
+    // 画面を閉じるイベント (true=成功, false=キャンセル)
     public event Action<bool>? RequestClose;
+
+    // 警告を表示するためのイベント (タイトル, メッセージ)
+    public event Action<string, string>? ShowAlert;
 
     [ObservableProperty]
     private string _selectedPort = string.Empty;
@@ -46,11 +49,11 @@ public partial class ConnectViewModel : ObservableObject
     [RelayCommand]
     private void Connect()
     {
+        // バリデーション
         if (string.IsNullOrEmpty(SelectedPort))
         {
-            // 修正: System.Windows を明示
-            System.Windows.MessageBox.Show("シリアルポートが選択されていません。", "警告",
-                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+            // 直接MessageBoxを出さず、Viewに依頼する
+            ShowAlert?.Invoke("警告", "シリアルポートが選択されていません。");
             return;
         }
 
@@ -61,6 +64,7 @@ public partial class ConnectViewModel : ObservableObject
             baudRate = 19200;
         }
 
+        // 接続テスト
         try
         {
             using (var serial = new SerialPort(portName, baudRate))
@@ -69,13 +73,13 @@ public partial class ConnectViewModel : ObservableObject
                 serial.Close();
             }
 
+            // 成功
             RequestClose?.Invoke(true);
         }
         catch (Exception ex)
         {
-            // 修正: System.Windows を明示
-            System.Windows.MessageBox.Show($"ポートの解放に失敗しました。\n{ex.Message}", "接続エラー",
-                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            // エラー表示もViewに依頼
+            ShowAlert?.Invoke("接続エラー", $"ポートの解放に失敗しました。\n{ex.Message}");
         }
     }
 

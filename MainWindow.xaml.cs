@@ -50,7 +50,7 @@ public partial class MainWindow : FluentWindow
         _serialPort.PortName = portName;
         _serialPort.BaudRate = baudRate;
 
-        this.Title = $"SerialApp - {portName} : {baudRate} bps";
+        Title = $"SerialApp - {portName} : {baudRate} bps";
     }
 
     private void SettingsItem_Click(object sender, RoutedEventArgs e)

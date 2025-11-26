@@ -7,8 +7,8 @@
                  xmlns:vm="clr-namespace:SerialApp.ViewModels"
                  mc:Ignorable="d"
                  Title="接続設定"
-        Height="350"
-        Width="400"
+                 Height="350"
+                 Width="400"
                  WindowStartupLocation="CenterScreen"
                  ResizeMode="NoResize">
 
@@ -19,62 +19,70 @@
     <d:Window.DataContext>
         <vm:ConnectViewModel/>
     </d:Window.DataContext>
+    <DockPanel LastChildFill="True">
+        <ui:TitleBar DockPanel.Dock="Top"
+                     Title="接続設定"
+                     x:Name="TitleBar"
+                     ShowMinimize="True"
+                     ShowMaximize="False"
+                     ShowClose="True"
+                     Margin="0"/>
+        <Grid Margin="20">
+            <StackPanel VerticalAlignment="Center">
 
-    <Grid Margin="20">
-        <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="シリアルポート設定"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
 
-            <TextBlock Text="シリアルポート設定"
-                    FontSize="20"
-                    FontWeight="Bold"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,20"/>
+                <!-- ポート選択 -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="ポート (COM)"
+                               Margin="0,0,0,5"/>
+                    <!-- 修正: ui:ComboBox に変更 -->
+                    <ComboBox ItemsSource="{Binding PortList}"
+                              SelectedItem="{Binding SelectedPort}"
+                              Text="ポートを選択してください"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
 
-            <!-- ポート選択 -->
-            <StackPanel Margin="0,0,0,15">
-                <TextBlock Text="ポート (COM)"
-                        Margin="0,0,0,5"/>
-                <!-- 修正: ui:ComboBox に変更 -->
-                <ui:ComboBox ItemsSource="{Binding PortList}"
-                             SelectedItem="{Binding SelectedPort}"
-                             PlaceholderText="ポートを選択してください"
-                             HorizontalAlignment="Stretch"/>
+                <!-- ボーレート選択 -->
+                <StackPanel Margin="0,0,0,20">
+                    <TextBlock Text="ボーレート"
+                               Margin="0,0,0,5"/>
+                    <!-- 修正: ui:ComboBox に変更 -->
+                    <ComboBox ItemsSource="{Binding BaudRateList}"
+                              SelectedItem="{Binding SelectedBaudRate}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <!-- ボタンエリア -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 修正: ui:Button に変更 -->
+                    <ui:Button Grid.Column="0"
+                               Content="キャンセル"
+                               Icon="{ui:SymbolIcon Dismiss24}"
+                               Appearance="Secondary"
+                               Command="{Binding CancelCommand}"
+                               HorizontalAlignment="Stretch"/>
+
+                    <!-- 修正: ui:Button に変更 -->
+                    <ui:Button Grid.Column="2"
+                               Content="OK (接続)"
+                               Icon="{ui:SymbolIcon Checkmark24}"
+                               Appearance="Primary"
+                               Command="{Binding ConnectCommand}"
+                               HorizontalAlignment="Stretch"/>
+                </Grid>
+
             </StackPanel>
-
-            <!-- ボーレート選択 -->
-            <StackPanel Margin="0,0,0,20">
-                <TextBlock Text="ボーレート"
-                        Margin="0,0,0,5"/>
-                <!-- 修正: ui:ComboBox に変更 -->
-                <ui:ComboBox ItemsSource="{Binding BaudRateList}"
-                             SelectedItem="{Binding SelectedBaudRate}"
-                             HorizontalAlignment="Stretch"/>
-            </StackPanel>
-
-            <!-- ボタンエリア -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- 修正: ui:Button に変更 -->
-                <ui:Button Grid.Column="0"
-                        Content="キャンセル"
-                           Icon="{ui:SymbolIcon Dismiss24}"
-                           Appearance="Secondary"
-                           Command="{Binding CancelCommand}"
-                           HorizontalAlignment="Stretch"/>
-
-                <!-- 修正: ui:Button に変更 -->
-                <ui:Button Grid.Column="2"
-                        Content="OK (接続)"
-                           Icon="{ui:SymbolIcon Checkmark24}"
-                           Appearance="Primary"
-                           Command="{Binding ConnectCommand}"
-                           HorizontalAlignment="Stretch"/>
-            </Grid>
-
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </DockPanel>
 </ui:FluentWindow>
