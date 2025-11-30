@@ -2,10 +2,10 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="CommandPage">
-    <Grid>
-        <TextBlock Text="コマンド送信画面"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="24"/>
-    </Grid>
+  <Grid>
+    <TextBlock Text="コマンド送信画面"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontSize="24"/>
+  </Grid>
 </Page>
