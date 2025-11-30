@@ -1,25 +1,28 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SerialApp.Models;   // 追加
+using SerialApp.Services; // 追加
 using System.Collections.ObjectModel;
 using System.IO.Ports;
+using Wpf.Ui.Controls;
+using System.Threading.Tasks;
 
 namespace SerialApp.ViewModels;
 
 public partial class ConnectViewModel : ObservableObject
 {
-    // 画面を閉じるイベント (true=成功, false=キャンセル)
     public event Action<bool>? RequestClose;
-
-    // 警告を表示するためのイベント (タイトル, メッセージ)
     public event Action<string, string>? ShowAlert;
 
+    // 選択されたポート情報そのものを保持するように変更
     [ObservableProperty]
-    private string _selectedPort = string.Empty;
+    private SerialPortInfo? _selectedPortInfo;
 
     [ObservableProperty]
     private string _selectedBaudRate = "19200";
 
-    public ObservableCollection<string> PortList { get; } = new();
+    // 文字列ではなくクラスのリストに変更
+    public ObservableCollection<SerialPortInfo> PortList { get; } = new();
 
     public ObservableCollection<string> BaudRateList { get; } = new()
     {
@@ -34,37 +37,39 @@ public partial class ConnectViewModel : ObservableObject
     public void LoadPorts()
     {
         PortList.Clear();
-        string[] ports = SerialPort.GetPortNames();
-        foreach (string port in ports)
+
+        // 画像のプログラム（Services.SerialPortGet）を使用して取得
+        var ports = SerialPortGet.AvailablePorts();
+
+        foreach (var port in ports)
         {
-            PortList.Add($"({port}) {port}");
+            PortList.Add(port);
         }
 
         if (PortList.Count > 0)
         {
-            SelectedPort = PortList[0];
+            SelectedPortInfo = PortList[0];
         }
     }
 
     [RelayCommand]
-    private void Connect()
+    private async Task Connect()
     {
-        // バリデーション
-        if (string.IsNullOrEmpty(SelectedPort))
+        // Infoオブジェクトがnullでないかチェック
+        if (SelectedPortInfo == null)
         {
-            // 直接MessageBoxを出さず、Viewに依頼する
-            ShowAlert?.Invoke("警告", "シリアルポートが選択されていません。");
+            await DialogService.ShowAsync("警告", "シリアルポートが選択されていません。", SymbolRegular.Warning24);
             return;
         }
 
-        string portName = ParsePortName(SelectedPort);
+        // COM番号を取り出す (例: "COM3")
+        string portName = SelectedPortInfo.PortName;
 
         if (!int.TryParse(SelectedBaudRate, out int baudRate))
         {
             baudRate = 19200;
         }
 
-        // 接続テスト
         try
         {
             using (var serial = new SerialPort(portName, baudRate))
@@ -73,13 +78,11 @@ public partial class ConnectViewModel : ObservableObject
                 serial.Close();
             }
 
-            // 成功
             RequestClose?.Invoke(true);
         }
         catch (Exception ex)
         {
-            // エラー表示もViewに依頼
-            ShowAlert?.Invoke("接続エラー", $"ポートの解放に失敗しました。\n{ex.Message}");
+            await DialogService.ShowAsync("接続エラー", $"ポートに接続できませんでした。\n{ex.Message}", SymbolRegular.ErrorCircle24);
         }
     }
 
@@ -87,15 +90,5 @@ public partial class ConnectViewModel : ObservableObject
     private void Cancel()
     {
         RequestClose?.Invoke(false);
-    }
-
-    public string ParsePortName(string displayText)
-    {
-        if (displayText.Contains('(') && displayText.Contains(')'))
-        {
-            string temp = displayText.Substring(displayText.IndexOf('(') + 1);
-            return temp.Substring(0, temp.IndexOf(')'));
-        }
-        return displayText;
     }
 }

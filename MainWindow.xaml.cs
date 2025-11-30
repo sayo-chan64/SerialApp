@@ -1,26 +1,25 @@
 ﻿using System.IO.Ports;
 using System.Windows;
-using System.Windows.Controls; // Frame操作用
+using System.Windows.Controls;
 using Wpf.Ui.Controls;
+using SerialApp.Services; // 追加
 
 namespace SerialApp;
 
 public partial class MainWindow : FluentWindow
 {
-    private SerialPort _serialPort = new SerialPort();
+    private readonly SerialPort _serialPort = new();
 
     public MainWindow()
     {
         InitializeComponent();
 
-        // 起動時に最初のページを表示
         RootNavigation.Loaded += (s, e) =>
         {
             NavigateTo("Command");
         };
     }
 
-    // ナビゲーションメニューが切り替わった時の処理
     private void RootNavigation_SelectionChanged(NavigationView sender, RoutedEventArgs e)
     {
         if (sender.SelectedItem is NavigationViewItem item && item.Tag is string tag)
@@ -29,7 +28,6 @@ public partial class MainWindow : FluentWindow
         }
     }
 
-    // ページ切り替えロジック
     private void NavigateTo(string tag)
     {
         switch (tag)
@@ -50,10 +48,10 @@ public partial class MainWindow : FluentWindow
         _serialPort.PortName = portName;
         _serialPort.BaudRate = baudRate;
 
-        Title = $"SerialApp - {portName} : {baudRate} bps";
+        this.Title = $"SerialApp - {portName} : {baudRate} bps";
     }
 
-    private void SettingsItem_Click(object sender, RoutedEventArgs e)
+    private async void SettingsItem_Click(object sender, RoutedEventArgs e)
     {
         var settingsWindow = new ConnectWindow();
         bool? result = settingsWindow.ShowDialog();
@@ -61,13 +59,20 @@ public partial class MainWindow : FluentWindow
         if (result == true)
         {
             var vm = settingsWindow.ViewModel;
-            string portName = vm.ParsePortName(vm.SelectedPort);
+
+            // 安全にプロパティ取得
+            string portName = vm.SelectedPortInfo?.PortName ?? "COM1";
             int baudRate = int.Parse(vm.SelectedBaudRate);
 
             InitializeSerialPort(portName, baudRate);
-            // 修正: System.Windows を明示
-            System.Windows.MessageBox.Show("接続設定を更新しました。", "情報",
-                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+
+            // 【変更点】DialogServiceを使ってモダンな成功メッセージを表示
+            // 緑色のチェックマークアイコンを指定
+            await DialogService.ShowAsync(
+                "設定更新",
+                "シリアルポートの接続設定を更新しました。",
+                SymbolRegular.CheckmarkCircle24
+            );
         }
     }
 }
