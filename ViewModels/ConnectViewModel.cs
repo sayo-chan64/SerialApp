@@ -22,12 +22,12 @@ public partial class ConnectViewModel : ObservableObject
     private string _selectedBaudRate = "19200";
 
     // 文字列ではなくクラスのリストに変更
-    public ObservableCollection<SerialPortInfo> PortList { get; } = new();
+    public ObservableCollection<SerialPortInfo> PortList { get; } = [];
 
-    public ObservableCollection<string> BaudRateList { get; } = new()
-    {
+    public ObservableCollection<string> BaudRateList { get; } =
+    [
         "9600", "19200", "38400", "57600", "115200"
-    };
+    ];
 
     public ConnectViewModel()
     {
