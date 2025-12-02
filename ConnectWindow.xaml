@@ -41,7 +41,8 @@
                     <TextBlock Text="ポート (COM)"
                                Margin="0,0,0,5"/>
                     <!-- 修正: ui:ComboBox に変更 -->
-                    <ComboBox ItemsSource="{Binding PortList}"
+                    <ComboBox ItemsSource="{Binding PortListInfo}"
+															DisplayMemberPath="DisplayName"
                               SelectedItem="{Binding SelectedPort}"
                               Text="ポートを選択してください"
                               HorizontalAlignment="Stretch"/>
