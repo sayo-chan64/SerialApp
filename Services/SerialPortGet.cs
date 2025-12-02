@@ -10,7 +10,7 @@ public static class SerialPortGet
     /// </summary>
     public static List<SerialPortInfo> AvailablePorts()
     {
-        List<SerialPortInfo> portList = new();
+        List<SerialPortInfo> portList = [];
 
         try
         {
@@ -49,6 +49,6 @@ public static class SerialPortGet
         }
 
         // ポート名順にソートして返す
-        return portList.OrderBy(p => p.PortName).ToList();
+        return [.. portList.OrderBy(p => p.PortName)];
     }
 }
