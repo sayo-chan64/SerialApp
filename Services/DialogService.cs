@@ -19,16 +19,14 @@ public static class DialogService
     public static async Task ShowAsync(string title, string message, SymbolRegular iconSymbol = SymbolRegular.Info24)
     {
         // 1. アイコンの色を種類によって自動決定
-        Brush iconColor = Brushes.White; // デフォルト
-
-        if (iconSymbol == SymbolRegular.Warning24)
-            iconColor = Brushes.Orange;
-        else if (iconSymbol == SymbolRegular.ErrorCircle24)
-            iconColor = Brushes.Red;
-        else if (iconSymbol == SymbolRegular.CheckmarkCircle24)
-            iconColor = Brushes.LightGreen;
-        else if (iconSymbol == SymbolRegular.Info24)
-            iconColor = Brushes.SkyBlue;
+        Brush iconColor = iconSymbol switch; // デフォルト
+        {
+            SymbolRegular.Warning24 => Brushes.Orange;
+            SymbolRegular.ErrorCircle24 => Brushes.Red;
+            SymbolRegular.CheckmarkCircle24 => Brushes.LightGreen;
+            SymbolRegular.Info24 => Brushes.SkyBlue;
+            _ => Brushes.White;
+        };
 
         // 2. レイアウトの構築 (アイコン + テキスト)
         var contentStack = new StackPanel
